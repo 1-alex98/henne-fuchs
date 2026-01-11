@@ -1,0 +1,7 @@
+@if (state() == State.CHICKEN) {
+  <svg:image (click)="emitClick($event)" class="hover-image {{selectable()?'selectable':''}} {{selected()?'selected':''}}" [attr.id]="id()" [attr.x]="xCoordinate()" [attr.y]="yCoordinate()" width="30" height="30" href="chicken.svg" xmlns:svg="http://www.w3.org/2000/svg"></svg:image>
+}
+@if (state() == State.FOX) {
+  <svg:image (click)="emitClick($event)" class="hover-image {{selectable()?'selectable':''}} {{selected()?'selected':''}}" [attr.id]="id()" [attr.x]="xCoordinate()" [attr.y]="yCoordinate()" width="30" height="30" href="fox.svg" xmlns:svg="http://www.w3.org/2000/svg"></svg:image>
+}
+

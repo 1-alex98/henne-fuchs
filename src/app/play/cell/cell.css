@@ -1,0 +1,20 @@
+/* Select the image class */
+.selectable.hover-image {
+  cursor: pointer;               /* Changes cursor to hand/pointer */
+  transform-origin: center;      /* Ensures it scales from the middle */
+}
+
+.hover-image.selected {
+  filter: drop-shadow(0 0 8px rgba(0, 123, 255, 0.8));
+  transform: scale(1.2);         /* Makes image 20% bigger */
+  transform-origin: center;
+  transform-box: fill-box;
+}
+
+/* Apply styles on hover */
+.selectable.hover-image:hover {
+  transition: transform 0.3s; /* Smooth scaling animation */
+  transform: scale(1.2);         /* Makes image 20% bigger */
+  transform-origin: center;
+  transform-box: fill-box;
+}

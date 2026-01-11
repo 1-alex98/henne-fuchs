@@ -1,0 +1,156 @@
+<style>
+  .svg-bottom {
+    position: fixed;   /* sticks to bottom of screen */
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+  }
+
+  .svg-bottom svg {
+    width: 100vw;
+    height: 80vh;
+  }
+</style>
+<p>Currently Playing: Chicken</p>
+<div class="svg-bottom">
+  <svg viewBox="75 75 425 425" width="600" height="600" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+
+    <style>
+      line {
+        stroke: black;
+        stroke-width: 2;
+      }
+      circle {
+        fill: white;
+        stroke: black;
+        stroke-width: 2;
+      }
+    </style>
+
+    <!-- Connections -->
+    <!-- Horizontal lines -->
+    <line id="h1" x1="200" y1="100" x2="300" y2="100"/>
+    <line id="h2" x1="200" y1="150" x2="300" y2="150"/>
+    <line id="h3" x1="100" y1="200" x2="400" y2="200"/>
+    <line id="h4" x1="100" y1="250" x2="400" y2="250"/>
+    <line id="h5" x1="100" y1="300" x2="400" y2="300"/>
+    <line id="h6" x1="200" y1="350" x2="300" y2="350"/>
+    <line id="h7" x1="200" y1="400" x2="300" y2="400"/>
+
+    <!-- Vertical lines -->
+    <line id="v1" x1="100" y1="200" x2="100" y2="300"/>
+    <line id="v2" x1="150" y1="200" x2="150" y2="300"/>
+    <line id="v3" x1="200" y1="100" x2="200" y2="400"/>
+    <line id="v4" x1="250" y1="100" x2="250" y2="400"/>
+    <line id="v5" x1="300" y1="100" x2="300" y2="400"/>
+    <line id="v6" x1="350" y1="200" x2="350" y2="300"/>
+    <line id="v7" x1="400" y1="200" x2="400" y2="300"/>
+
+    <!-- Diagonals (nearest neighbors only) -->
+    <line x1="200" y1="200" x2="250" y2="250"/>
+    <line x1="300" y1="200" x2="250" y2="250"/>
+    <line x1="200" y1="300" x2="250" y2="250"/>
+    <line x1="300" y1="300" x2="250" y2="250"/>
+    <!-- Diagonals left -->
+    <line x1="100" y1="200" x2="200" y2="300"/>
+    <line x1="200" y1="200" x2="100" y2="300"/>
+    <!-- Diagonals right -->
+    <line id="r1" x1="300" y1="200" x2="400" y2="300"/>
+    <line id="r2" x1="400" y1="200" x2="300" y2="300"/>
+    <!-- Diagonals top -->
+    <line id="t1" x1="200" y1="100" x2="300" y2="200"/>
+    <line id="t2" x1="300" y1="100" x2="200" y2="200"/>
+    <!-- Diagonals bottom -->
+    <line id="b1" x1="200" y1="300" x2="300" y2="400"/>
+    <line id="b2" x1="300" y1="300" x2="200" y2="400"/>
+
+    <!-- Points -->
+    <!-- left -->
+    <circle id="p7" cx="100" cy="200" r="8" (click)="clickedMove(0, 2)" [class]="styleClassFor(0,2)"/>
+    <circle id="p8" cx="150" cy="200" r="8" (click)="clickedMove(1, 2)" [class]="styleClassFor(1,2)"/>
+    <circle id="p14" cx="100" cy="250" r="8" (click)="clickedMove(0, 3)" [class]="styleClassFor(0,3)"/>
+    <circle id="p15" cx="150" cy="250" r="8" (click)="clickedMove(1, 3)" [class]="styleClassFor(1,3)"/>
+    <circle id="p21" cx="100" cy="300" r="8" (click)="clickedMove(0, 4)" [class]="styleClassFor(0,4)"/>
+    <circle id="p22" cx="150" cy="300" r="8" (click)="clickedMove(1, 4)" [class]="styleClassFor(1,4)"/>
+    <!-- right -->
+    <circle id="p12" cx="400" cy="200" r="8" (click)="clickedMove(6, 2)" [class]="styleClassFor(6, 2)"/>
+    <circle id="p13" cx="350" cy="200" r="8" (click)="clickedMove(5, 2)" [class]="styleClassFor(5, 2)"/>
+    <circle id="p19" cx="400" cy="250" r="8" (click)="clickedMove(6, 3)" [class]="styleClassFor(6, 3)"/>
+    <circle id="p20" cx="350" cy="250" r="8" (click)="clickedMove(5, 3)" [class]="styleClassFor(5, 3)"/>
+    <circle id="p26" cx="400" cy="300" r="8" (click)="clickedMove(6, 4)" [class]="styleClassFor(6, 4)"/>
+    <circle id="p27" cx="350" cy="300" r="8" (click)="clickedMove(5, 4)" [class]="styleClassFor(5, 4)"/>
+
+    <!-- top -->
+    <circle id="p1" cx="200" cy="100" r="8" (click)="clickedMove(2, 0)" [class]="styleClassFor(2,0)"/>
+    <circle id="p2" cx="250" cy="100" r="8" (click)="clickedMove(3, 0)" [class]="styleClassFor(3,0)"/>
+    <circle id="p3" cx="300" cy="100" r="8" (click)="clickedMove(4, 0)" [class]="styleClassFor(4,0)"/>
+    <circle id="p4" cx="200" cy="150" r="8" (click)="clickedMove(2, 1)" [class]="styleClassFor(2,1)"/>
+    <circle id="p5" cx="250" cy="150" r="8" (click)="clickedMove(3, 1)" [class]="styleClassFor(3,1)"/>
+    <circle id="p6" cx="300" cy="150" r="8" (click)="clickedMove(4, 1)" [class]="styleClassFor(4,1)"/>
+
+    <!-- bottom -->
+    <circle id="p28" cx="200" cy="350" r="8" (click)="clickedMove(2, 5)" [class]="styleClassFor(2, 5)"/>
+    <circle id="p31" cx="200" cy="400" r="8" (click)="clickedMove(2, 6)" [class]="styleClassFor(2, 6)"/>
+    <circle id="p29" cx="250" cy="350" r="8" (click)="clickedMove(3, 5)" [class]="styleClassFor(3, 5)"/>
+    <circle id="p32" cx="250" cy="400" r="8" (click)="clickedMove(3, 6)" [class]="styleClassFor(3, 6)"/>
+    <circle id="p30" cx="300" cy="350" r="8" (click)="clickedMove(4, 5)" [class]="styleClassFor(4, 5)"/>
+    <circle id="p33" cx="300" cy="400" r="8" (click)="clickedMove(4, 6)" [class]="styleClassFor(4, 6)"/>
+
+    <!-- Center block -->
+    <circle id="p9" cx="200" cy="200" r="8"  (click)="clickedMove(2, 2)" [class]="styleClassFor(2, 2)"/>
+    <circle id="p10" cx="250" cy="200" r="8" (click)="clickedMove(3, 2)" [class]="styleClassFor(3, 2)"/>
+    <circle id="p11" cx="300" cy="200" r="8" (click)="clickedMove(4, 2)" [class]="styleClassFor(4, 2)"/>
+    <circle id="p16" cx="200" cy="250" r="8" (click)="clickedMove(2, 3)" [class]="styleClassFor(2, 3)"/>
+    <circle id="p17" cx="250" cy="250" r="8" (click)="clickedMove(3, 3)" [class]="styleClassFor(3, 3)"/>
+    <circle id="p18" cx="300" cy="250" r="8" (click)="clickedMove(4, 3)" [class]="styleClassFor(4, 3)"/>
+    <circle id="p23" cx="200" cy="300" r="8" (click)="clickedMove(2, 4)" [class]="styleClassFor(2, 4)"/>
+    <circle id="p24" cx="250" cy="300" r="8" (click)="clickedMove(3, 4)" [class]="styleClassFor(3, 4)"/>
+    <circle id="p25" cx="300" cy="300" r="8" (click)="clickedMove(4, 4)" [class]="styleClassFor(4, 4)"/>
+
+    <!-- Chickens/Foxes -->
+
+    <!-- left -->
+    <g app-cell [state]="stateFor(0,2)()" [x]="0" [y]="2" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="boardService.selectedPiece()"></g>
+    <g app-cell [state]="stateFor(1,2)()" [x]="1" [y]="2" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="boardService.selectedPiece()"></g>
+    <g app-cell [state]="stateFor(0,3)()" [x]="0" [y]="3" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="boardService.selectedPiece()"></g>
+    <g app-cell [state]="stateFor(1,3)()" [x]="1" [y]="3" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="boardService.selectedPiece()"></g>
+    <g app-cell [state]="stateFor(0,4)()" [x]="0" [y]="4" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="boardService.selectedPiece()"></g>
+    <g app-cell [state]="stateFor(1,4)()" [x]="1" [y]="4" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="boardService.selectedPiece()"></g>
+
+    <!-- right -->
+    <g app-cell [state]="stateFor(5,2)()" [x]="5" [y]="2" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="boardService.selectedPiece()"></g>
+    <g app-cell [state]="stateFor(6,2)()" [x]="6" [y]="2" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="boardService.selectedPiece()"></g>
+    <g app-cell [state]="stateFor(5,3)()" [x]="5" [y]="3" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="boardService.selectedPiece()"></g>
+    <g app-cell [state]="stateFor(6,3)()" [x]="6" [y]="3" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="boardService.selectedPiece()"></g>
+    <g app-cell [state]="stateFor(5,4)()" [x]="5" [y]="4" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="boardService.selectedPiece()"></g>
+    <g app-cell [state]="stateFor(6,4)()" [x]="6" [y]="4" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="boardService.selectedPiece()"></g>
+
+    <!-- top -->
+    <g app-cell [state]="stateFor(2,0)()" [x]="2" [y]="0" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="boardService.selectedPiece()"></g>
+    <g app-cell [state]="stateFor(3,0)()" [x]="3" [y]="0" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="boardService.selectedPiece()"></g>
+    <g app-cell [state]="stateFor(4,0)()" [x]="4" [y]="0" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="boardService.selectedPiece()"></g>
+    <g app-cell [state]="stateFor(2,1)()" [x]="2" [y]="1" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="boardService.selectedPiece()"></g>
+    <g app-cell [state]="stateFor(3,1)()" [x]="3" [y]="1" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="boardService.selectedPiece()"></g>
+    <g app-cell [state]="stateFor(4,1)()" [x]="4" [y]="1" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="boardService.selectedPiece()"></g>
+
+    <!-- bottom -->
+    <g app-cell [state]="stateFor(2,5)()" [x]="2" [y]="5" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="boardService.selectedPiece()"></g>
+    <g app-cell [state]="stateFor(3,6)()" [x]="3" [y]="6" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="boardService.selectedPiece()"></g>
+    <g app-cell [state]="stateFor(4,5)()" [x]="4" [y]="5" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="boardService.selectedPiece()"></g>
+    <g app-cell [state]="stateFor(2,6)()" [x]="2" [y]="6" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="boardService.selectedPiece()"></g>
+    <g app-cell [state]="stateFor(3,5)()" [x]="3" [y]="5" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="boardService.selectedPiece()"></g>
+    <g app-cell [state]="stateFor(4,6)()" [x]="4" [y]="6" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="boardService.selectedPiece()"></g>
+
+    <!-- center block -->
+    <g app-cell [state]="stateFor(2,2)()" [x]="2" [y]="2" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="boardService.selectedPiece()"></g>
+    <g app-cell [state]="stateFor(3,2)()" [x]="3" [y]="2" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="boardService.selectedPiece()"></g>
+    <g app-cell [state]="stateFor(4,2)()" [x]="4" [y]="2" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="boardService.selectedPiece()"></g>
+    <g app-cell [state]="stateFor(2,3)()" [x]="2" [y]="3" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="boardService.selectedPiece()"></g>
+    <g app-cell [state]="stateFor(3,3)()" [x]="3" [y]="3" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="boardService.selectedPiece()"></g>
+    <g app-cell [state]="stateFor(4,3)()" [x]="4" [y]="3" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="boardService.selectedPiece()"></g>
+    <g app-cell [state]="stateFor(2,4)()" [x]="2" [y]="4" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="boardService.selectedPiece()"></g>
+    <g app-cell [state]="stateFor(3,4)()" [x]="3" [y]="4" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="boardService.selectedPiece()"></g>
+    <g app-cell [state]="stateFor(4,4)()" [x]="4" [y]="4" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="boardService.selectedPiece()"></g>
+  </svg>
+
+</div>
