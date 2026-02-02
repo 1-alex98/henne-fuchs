@@ -23,6 +23,9 @@ export class Cell {
   @Output() imageClicked = new EventEmitter<Point>();
 
   emitClick(event: MouseEvent) {
+    if(!this.selectable()) {
+      return;
+    }
     this.imageClicked.emit(new Point(this.x(), this.y()));
   }
 

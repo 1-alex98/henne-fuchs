@@ -11,9 +11,16 @@
     height: 80vh;
   }
 </style>
-<p>Currently Playing: Chicken</p>
+<div style="margin: 1em;">
+  <p style="display: flex; flex-wrap: wrap; justify-content: space-between; width: 100%">
+    <span style="padding: 0.3em">Playing:{{ boardService.playersTurn() == Player.CHICKEN ? 'Chicken': 'Fox' }}</span>
+    <span style="padding: 0.3em">Chickens:{{boardService.chickens()}}</span>
+    <span style="padding: 0.3em">Chickens in stall:{{boardService.chickensInStall()}}</span>
+  </p>
+</div>
+<app-overlay [text]="boardService.winingReason()"></app-overlay>
 <div class="svg-bottom">
-  <svg viewBox="75 75 425 425" width="600" height="600" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+  <svg viewBox="75 75 350 350" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
 
     <style>
       line {
