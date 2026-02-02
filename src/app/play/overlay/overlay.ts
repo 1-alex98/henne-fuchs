@@ -1,4 +1,4 @@
-import {Component, input, Input} from '@angular/core';
+import {Component, input, output} from '@angular/core';
 
 @Component({
   selector: 'app-overlay',
@@ -8,5 +8,9 @@ import {Component, input, Input} from '@angular/core';
 })
 export class Overlay {
   text = input.required<String|undefined>()
+  playAgain = output<void>();
 
+  onPlayAgain() {
+    this.playAgain.emit();
+  }
 }

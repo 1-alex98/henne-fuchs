@@ -1,3 +1,49 @@
-<p>explain works!</p>
+<!-- src/app/explain/explain.html -->
 
+<section class="explain">
+  <h2>How to play</h2>
 
+  <h3>How chickens move</h3>
+  <ul>
+    <li>Chickens move <strong>one cell</strong> to an <strong>empty</strong> connected cell.</li>
+    <li>Chickens can move <strong>left</strong>, <strong>right</strong>, and <strong>up</strong> (towards the stall area).</li>
+    <li>Chickens <strong>cannot</strong> move down.</li>
+    <li>There is no jumping/capturing move for chickens in this implementation.</li>
+  </ul>
+
+  <h3>How foxes move</h3>
+  <ul>
+    <li>Foxes move <strong>one cell</strong> to an <strong>empty</strong> connected cell.</li>
+    <li>Foxes can move <strong>left</strong>, <strong>right</strong>, <strong>up</strong>, and <strong>down</strong>.</li>
+    <li>On some positions, <strong>diagonal</strong> connections exist, so a fox may also move diagonally when that connection is present.</li>
+  </ul>
+
+  <h3>How foxes jump (capture)</h3>
+  <ul>
+    <li>If a fox has an adjacent chicken, and the cell <strong>immediately beyond</strong> that chicken (in the same direction) is empty, the fox can <strong>jump</strong> there.</li>
+    <li>The jumped chicken is removed from the board.</li>
+    <li>Foxes can chain jumps; the <strong>best</strong> jump is the one that continues until no further jump is possible.</li>
+    <li>If any fox can jump, foxes are expected to jump. If a fox moves instead, it is punished.</li>
+    <li>If a fox starts a jump but does not continue to the end of a possible chain, it is punished.</li>
+  </ul>
+
+  <h3>How chickens win</h3>
+  <ul>
+    <li>Chickens win when <strong>9 or more</strong> chickens are in the stall area.</li>
+  </ul>
+
+  <h3>How foxes win</h3>
+  <ul>
+    <li>Foxes win when the number of chickens left is <strong>less than 9</strong> (enough chickens have been removed).</li>
+  </ul>
+
+  <h3>How foxes can lose by punishment</h3>
+  <ul>
+    <li>If a fox is punished (for not jumping, or not completing a jump chain), that fox is removed.</li>
+    <li>If there are <strong>no foxes left</strong>, foxes lose.</li>
+  </ul>
+  <h3>One Rule is not enforced</h3>
+  <ul>
+    <li>Chickens should not move in circles. Otherwise consider the foxes win.</li>
+  </ul>
+</section>

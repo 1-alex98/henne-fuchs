@@ -18,7 +18,7 @@
     <span style="padding: 0.3em">Chickens in stall:{{boardService.chickensInStall()}}</span>
   </p>
 </div>
-<app-overlay [text]="boardService.winingReason()"></app-overlay>
+<app-overlay [text]="boardService.winingReason()" (playAgain)="onPlayAgain()"></app-overlay>
 <div class="svg-bottom">
   <svg viewBox="75 75 350 350" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
 
