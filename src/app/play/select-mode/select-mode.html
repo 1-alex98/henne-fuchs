@@ -1,0 +1,52 @@
+<div class="overlay">
+  <div class="modal">
+    @if (step() === 'mode') {
+      <h1>Choose game mode</h1>
+      <p>Do you want to play against the AI or with two players?</p>
+
+      <div class="options">
+        <button class="option" type="button" (click)="chooseOnePlayer()">
+          <img src="/1player.svg" alt="Play against AI" />
+          <span>1 Player (vs AI)</span>
+        </button>
+
+        <button class="option" type="button" (click)="chooseTwoPlayers()">
+          <img src="/2players.svg" alt="Two players" />
+          <span>2 Players</span>
+        </button>
+      </div>
+    }
+
+    @if (step() === 'side') {
+      <h1>Play against AI</h1>
+      <p>Which side do you want to play?</p>
+
+      <div class="options">
+        <button
+          class="option side"
+          type="button"
+          [class.selected]="selectedSide() === Player.CHICKEN"
+          (click)="setSide(Player.CHICKEN)"
+        >
+          <img src="/chicken.svg" alt="Play as chickens" />
+          <span>Chickens (You)</span>
+        </button>
+
+        <button
+          class="option side"
+          type="button"
+          [class.selected]="selectedSide() === Player.FOX"
+          (click)="setSide(Player.FOX)"
+        >
+          <img src="/fox.svg" alt="Play as foxes" />
+          <span>Foxes (You)</span>
+        </button>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="secondary" (click)="back()">Back</button>
+        <button type="button" class="primary" (click)="startOnePlayer()">Start</button>
+      </div>
+    }
+  </div>
+</div>

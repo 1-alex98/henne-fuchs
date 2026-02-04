@@ -12,10 +12,19 @@
   }
 </style>
 <div style="margin: 1em;">
-  <p style="display: flex; flex-wrap: wrap; justify-content: space-between; width: 100%">
-    <span style="padding: 0.3em">Playing:{{ boardService.playersTurn() == Player.CHICKEN ? 'Chicken': 'Fox' }}</span>
-    <span style="padding: 0.3em">Chickens:{{boardService.chickens()}}</span>
-    <span style="padding: 0.3em">Chickens in stall:{{boardService.chickensInStall()}}</span>
+  <p style="display: flex; flex-wrap: wrap; justify-content: center; gap: 1.5em; width: 100%">
+<span style="padding: 0.3em; display: inline-flex; align-items: center; gap: 0.5em;">
+      Playing:
+      <img
+        [src]="boardService.playersTurn() == Player.CHICKEN ? 'chicken.svg' : 'fox.svg'"
+        [alt]="boardService.playersTurn() == Player.CHICKEN ? 'Chicken' : 'Fox'"
+        width="24"
+        height="24"
+        style="display: inline-block;"
+      />
+    </span><!--    <span style="padding: 0.3em">Chickens:{{boardService.chickens()}}</span>-->
+<!--    <span style="padding: 0.3em">Chickens in stall:{{boardService.chickensInStall()}}</span>-->
+    <button class="play-again-btn" style="padding: 0.3em 0.8em" (click)="onPlayAgain()">Reset</button>
   </p>
 </div>
 <app-overlay [text]="boardService.winingReason()" (playAgain)="onPlayAgain()"></app-overlay>
