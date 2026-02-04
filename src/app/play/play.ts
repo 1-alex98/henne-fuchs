@@ -1,8 +1,8 @@
 import {Component, effect, inject, signal, Signal} from '@angular/core';
 import { Router } from '@angular/router';
-import {Cell} from './cell';
+import {Cell} from './cell/cell';
 import {Board, JumpOption, Player, Point, State} from './board';
-import {Overlay} from './overlay';
+import {Overlay} from './overlay/overlay';
 import { ToastService } from '../shared/toast/toast.service';
 import { GameSettingsService } from './game-settings.service';
 import { BoardMatrixService } from './ai/board-matrix.service';
