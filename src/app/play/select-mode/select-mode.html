@@ -6,12 +6,12 @@
 
       <div class="options">
         <button class="option" type="button" (click)="chooseOnePlayer()">
-          <img src="/1player.svg" alt="Play against AI" />
+          <img src="../1player.svg" alt="Play against AI" />
           <span>1 Player (vs AI)</span>
         </button>
 
         <button class="option" type="button" (click)="chooseTwoPlayers()">
-          <img src="/2players.svg" alt="Two players" />
+          <img src="../2players.svg" alt="Two players" />
           <span>2 Players</span>
         </button>
       </div>
@@ -28,7 +28,7 @@
           [class.selected]="selectedSide() === Player.CHICKEN"
           (click)="setSide(Player.CHICKEN)"
         >
-          <img src="/chicken.svg" alt="Play as chickens" />
+          <img src="../chicken.svg" alt="Play as chickens" />
           <span>Chickens (You)</span>
         </button>
 
@@ -38,7 +38,7 @@
           [class.selected]="selectedSide() === Player.FOX"
           (click)="setSide(Player.FOX)"
         >
-          <img src="/fox.svg" alt="Play as foxes" />
+          <img src="../fox.svg" alt="Play as foxes" />
           <span>Foxes (You)</span>
         </button>
       </div>
