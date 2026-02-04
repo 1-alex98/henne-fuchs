@@ -44,7 +44,7 @@ export class Cell {
     if(!onlyChicken) {
       points.push(new Point(x, y+1));
     }
-    if((x%2 == 0 && y%2 == 0) || (x%2 != 0 && y%2 != 0) && !onlyChicken) {
+    if(((x%2 == 0 && y%2 == 0) || (x%2 != 0 && y%2 != 0)) && !onlyChicken) {
       points.push(new Point(x + 1, y + 1));
       points.push(new Point(x - 1, y + 1));
       points.push(new Point(x + 1, y - 1));
@@ -100,6 +100,12 @@ export enum Player {
   FOX
 }
 
+export interface MoveAttemptResult {
+  outcome: 'moved' | 'jumped' | 'punished' | 'ignored';
+  /** Optional message for the UI (e.g. toast). */
+  message?: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -107,7 +113,6 @@ export class Board {
 
   private board: Map<String, Cell> = new Map();
   public playersTurn = signal(Player.CHICKEN)
-  public selectedPiece = signal<Point|undefined>(undefined)
   public chickens
   public foxes
   public chickensInStall
@@ -163,7 +168,6 @@ export class Board {
     }
 
     this.playersTurn.set(Player.CHICKEN);
-    this.selectedPiece.set(undefined);
     this.winingReason.set(undefined);
   }
 
@@ -177,29 +181,21 @@ export class Board {
     return State.EMPTY;
   }
 
-  setSelectedPiece(point: Point|undefined) {
-    this.selectedPiece.set(point)
-  }
-
-  getMoves(x: number, y: number) {
-    let point = new Point(x,y);
+  getMoves(point:Point) {
     let connectedCells = this.board.get(point.toString())!.getConnectedCells(this.board, this.playersTurn() == Player.CHICKEN);
     return connectedCells.filter(value => this.board.get(value.toString())!.getState()() === State.EMPTY)
   }
 
-  getJumps(x: number, y: number) {
-    let point = new Point(x,y);
-    this.selectedPiece.set(point)
+  getJumps(point: Point) {
     return this.board.get(point.toString())!.getJumpsCells(this.board, [], undefined);
   }
 
-  moveTo(x: number, y: number) {
-    let point = new Point(x, y);
-    if(this.selectedPiece() == undefined) {
+  moveTo(selectedPiece: Point | undefined, to:Point) {
+    if (!selectedPiece) {
       return;
     }
-    this.board.get((this.selectedPiece() as Point).toString())?.getWritableState().set(State.EMPTY);
-    this.board.get(point.toString())?.getWritableState().set(
+    this.board.get(selectedPiece.toString())?.getWritableState().set(State.EMPTY);
+    this.board.get(to.toString())?.getWritableState().set(
       this.playersTurn() == Player.CHICKEN ? State.CHICKEN : State.FOX
     );
     this.changePlayer();
@@ -209,18 +205,21 @@ export class Board {
   }
 
   private changePlayer() {
-    this.selectedPiece.set(undefined);
     this.playersTurn.set(
       this.playersTurn() == Player.CHICKEN ? Player.FOX : Player.CHICKEN
     );
   }
 
-  jumpTo(jumpOption: JumpOption) {
+  jumpTo(selectedPiece: Point | undefined, jumpOption: JumpOption) {
+    if (!selectedPiece) {
+      return;
+    }
+
     jumpOption.toBeRemovedChickens
       .forEach(point => {
         this.board.get(point.toString())?.getWritableState().set(State.EMPTY);
       })
-    this.board.get((this.selectedPiece() as Point).toString())!.getWritableState().set(State.EMPTY);
+    this.board.get(selectedPiece.toString())!.getWritableState().set(State.EMPTY);
     this.board.get(jumpOption.end.toString())!.getWritableState().set(State.FOX);
     this.changePlayer();
 
@@ -230,9 +229,10 @@ export class Board {
     }
   }
 
-  punishForJump(jumpOption: JumpOption) {
+  punishForJump(selectedPiece: Point | undefined, jumpOption: JumpOption) {
     console.log('Punish for jump:', jumpOption);
-    this.punish(this.selectedPiece()!);
+    if (!selectedPiece) return;
+    this.punish(selectedPiece);
   }
 
   private punish(point: Point) {
@@ -275,9 +275,68 @@ export class Board {
     for (const cell of this.board.values()) {
       if (cell.getState()() !== State.FOX) continue;
 
-      moves.push(...this.getMoves(cell.point.x, cell.point.y))
+      moves.push(...this.getMoves(cell.point))
     }
 
     return moves;
+  }
+
+  /**
+   * Applies the game rules when a player clicks a destination cell.
+   *
+   * Contract:
+   * - `availableMoves/jumps/allJumps` should be the options currently shown by the UI.
+   * - Returns a result that the UI can use to show a toast.
+   * - Performs side effects on the board (move/jump/punish) exactly like the old Play.clickedMove.
+   */
+  attemptMove(
+    selectedPiece: Point | undefined,
+    to:Point,
+    availableMoves: Point[],
+    availableJumps: JumpOption[],
+    allJumps: JumpOption[],
+  ): MoveAttemptResult {
+    const validMove = availableMoves.find(p => p.x === to.x && p.y === to.y);
+    const jumpOption = availableJumps.find(option => option.end.x === to.x && option.end.y === to.y);
+
+    if (validMove && allJumps.length === 0) {
+      this.moveTo(selectedPiece, to);
+      return { outcome: 'moved' };
+    }
+
+    if (validMove && allJumps.length !== 0) {
+      this.punishForNotJumping(allJumps);
+      return {
+        outcome: 'punished',
+        message: 'Nice try — jumping is mandatory when available.',
+      };
+    }
+
+    if (jumpOption && jumpOption.good) {
+      this.jumpTo(selectedPiece, jumpOption);
+      return { outcome: 'jumped' };
+    }
+
+    if (jumpOption && !jumpOption.good) {
+      this.punishForJump(selectedPiece, jumpOption);
+      return {
+        outcome: 'punished',
+        message: 'You must keep jumping until the move is finished.',
+      };
+    }
+
+    return { outcome: 'ignored' };
+  }
+
+  /**
+   * TEST-ONLY: set a cell's state directly.
+   * This makes it possible to create deterministic board setups in unit tests.
+   */
+  /* @__TEST_ONLY__ */
+  _setStateForTest(x: number, y: number, state: State) {
+    const key = new Point(x, y).toString();
+    const cell = this.board.get(key);
+    if (!cell) return;
+    cell.getWritableState().set(state);
   }
 }

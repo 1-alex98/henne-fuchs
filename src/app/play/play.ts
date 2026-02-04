@@ -17,6 +17,8 @@ export class Play {
 
   boardService = inject(Board)
   private readonly toast = inject(ToastService)
+
+  selectedPiece = signal<Point | undefined>(undefined)
   moves = signal<Point[]>([])
   jumps = signal<JumpOption[]>([])
   allJumps = signal<JumpOption[]>([])
@@ -27,9 +29,9 @@ export class Play {
   }
 
   protected clickedPiece(p: Point) {
-    this.boardService.setSelectedPiece(p)
-    this.moves.set(this.boardService.getMoves(p.x, p.y))
-    this.jumps.set(this.boardService.getJumps(p.x, p.y))
+    this.selectedPiece.set(p)
+    this.moves.set(this.boardService.getMoves(p))
+    this.jumps.set(this.boardService.getJumps(p))
     this.allJumps.set(this.boardService.getAllJumps())
     this.allMoves.set(this.boardService.getAllMoves())
     if(!this.allMoves() && !this.allJumps){
@@ -45,21 +47,17 @@ export class Play {
   }
 
   protected clickedMove(x: number, y: number) {
-    let validMove = this.moves().find(p => p.x == x && p.y == y);
-    let jumpOption = this.jumps().find(option => option.end.x == x && option.end.y == y);
-    if(validMove && this.allJumps().length == 0) {
-      this.boardService.moveTo(x, y)
-    } else if(validMove && this.allJumps().length != 0) {
-      this.toast.show('Nice try — jumping is mandatory when available.', { variant: 'warning' })
-      this.boardService.punishForNotJumping(this.allJumps())
-    }else if(jumpOption && jumpOption.good) {
-      this.boardService.jumpTo(jumpOption)
-    } else if(jumpOption && !jumpOption.good) {
-      this.toast.show('You must keep jumping until the move is finished.', { variant: 'warning' })
-      this.boardService.punishForJump(jumpOption)
-    } else {
-      return
+    const result = this.boardService.attemptMove(this.selectedPiece(), new Point(x, y), this.moves(), this.jumps(), this.allJumps());
+
+    if (result.message) {
+      this.toast.show(result.message, { variant: 'warning' });
     }
+
+    if (result.outcome === 'ignored') {
+      return;
+    }
+
+    this.selectedPiece.set(undefined)
     this.moves.set([])
     this.jumps.set([])
     this.allJumps.set([])
@@ -67,6 +65,7 @@ export class Play {
 
   onPlayAgain() {
     this.boardService.reset();
+    this.selectedPiece.set(undefined)
     this.moves.set([]);
     this.jumps.set([]);
     this.allJumps.set([]);
