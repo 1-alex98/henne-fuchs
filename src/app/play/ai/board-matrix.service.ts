@@ -202,7 +202,7 @@ export class BoardMatrixService {
     let value = Number.NEGATIVE_INFINITY;
     for (const m of chickenMoves) {
       const child = this.applyStepMove(snap, m.from, m.to);
-      const nextHistory = [this.fingerprint(child), ...chickenHistory].slice(0, 2);
+      const nextHistory = [this.fingerprint(child), ...chickenHistory].slice(0, 3);
       value = Math.max(value, this.minimax(child, depth - 1, this.otherPlayer(playerToMove), alpha, beta, nextHistory));
       alpha = Math.max(alpha, value);
       if (beta <= alpha) break;

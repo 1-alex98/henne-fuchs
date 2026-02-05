@@ -33,6 +33,13 @@ export class Play {
   private aiInProgress = false;
 
   /**
+   * We only want to reset the board once the user has finished the select-mode flow
+   * (i.e. GameSettings exist). This flag prevents repeated resets if settings change
+   * while staying on /play/game.
+   */
+  private hasInitializedGame = false;
+
+  /**
    * Keep the last couple chicken-result board fingerprints to avoid chicken oscillations
    * (e.g. left then immediately right). Only used when the AI plays chickens.
    */
@@ -45,14 +52,23 @@ export class Play {
   }
 
   constructor() {
-    // Always start a fresh game when entering /play/game.
-    // This ensures stale board/signals/selection can't leak across navigations.
-    this.onReset();
+    // Do NOT reset immediately on component creation.
+    // If the user navigates directly to /play/game without selecting a mode yet,
+    // we redirect them to /play/select and should not touch game state.
 
     // If the user hits /play/game directly, send them to the selection dialog.
     effect(() => {
-      if (!this.settings.settings()) {
+      const s = this.settings.settings();
+      if (!s) {
+        this.hasInitializedGame = false;
         void this.router.navigateByUrl('/play/select');
+        return;
+      }
+
+      // Select-mode is done -> start a fresh game exactly once.
+      if (!this.hasInitializedGame) {
+        this.onReset();
+        this.hasInitializedGame = true;
       }
     });
 
