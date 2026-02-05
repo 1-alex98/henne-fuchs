@@ -113,9 +113,9 @@ export class Board {
 
   private board: Map<String, Cell> = new Map();
   public playersTurn = signal(Player.CHICKEN)
-  public chickens
-  public foxes
-  public chickensInStall
+  private readonly chickens
+  private readonly foxes
+  private readonly chickensInStall
   public winingReason = signal<string|undefined>(undefined)
 
   constructor() {
@@ -162,7 +162,7 @@ export class Board {
    * Resets the game back to the initial setup.
    * Keeps the same board instance so all consumers keep their references/signals.
    */
-  reset() {
+  public reset() {
     for (const cell of this.board.values()) {
       cell.getWritableState().set(this.startStateFor(cell.point));
     }
