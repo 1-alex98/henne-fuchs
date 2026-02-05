@@ -1,0 +1,21 @@
+/* The Play Again Button */
+.play {
+  background-color: #4CAF50; /* Modern green */
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border-radius: 50px; /* Fully rounded corners */
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.play {
+  background-color: #45a049;
+  transform: scale(1.05); /* Slight pop effect */
+}
+
+.play:active {
+  transform: scale(0.95);
+}

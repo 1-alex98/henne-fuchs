@@ -90,7 +90,21 @@ export class BoardMatrixService {
     return { stepMoves, jumps };
   }
 
-  private allChickenMoves(snap: BoardMatrixSnapshot): Array<{ from: MatrixPoint; to: MatrixPoint }> {
+  /**
+   * Stable fingerprint for a snapshot's piece placement.
+   *
+   * We only include `states` because `validMask` is constant for this game geometry.
+   * Used to filter out repetitive chicken moves (A->B->A oscillations).
+   */
+  private fingerprint(snap: BoardMatrixSnapshot): string {
+    // Fast enough for our small 49-cell array.
+    return Array.from(snap.states).join(',');
+  }
+
+  private allChickenMoves(
+    snap: BoardMatrixSnapshot,
+    forbiddenNextFingerprints?: ReadonlySet<string>,
+  ): Array<{ from: MatrixPoint; to: MatrixPoint }> {
     const moves: Array<{ from: MatrixPoint; to: MatrixPoint }> = [];
 
     for (let y = 0; y < BOARD_H; y++) {
@@ -101,6 +115,12 @@ export class BoardMatrixService {
 
         const tos = getMovesForChicken(snap, x, y);
         for (const to of tos) {
+          if (forbiddenNextFingerprints && forbiddenNextFingerprints.size > 0) {
+            const child = this.applyStepMove(snap, { x, y }, to);
+            const fp = this.fingerprint(child);
+            if (forbiddenNextFingerprints.has(fp)) continue;
+          }
+
           moves.push({ from: { x, y }, to });
         }
       }
@@ -143,13 +163,14 @@ export class BoardMatrixService {
     playerToMove: Player,
     alpha: number,
     beta: number,
+    chickenHistory: readonly string[] = [],
   ): number {
     if (depth <= 0) {
       return this.scoreForChickens(snap);
     }
 
     if (playerToMove === Player.FOX) {
-      // Fox minimizes chicken score.
+      // Fox minimizes chicken score. Fox can repeat moves; history is unchanged.
       const foxMoves = this.allFoxMoves(snap);
       const hasForcedJumps = foxMoves.jumps.length > 0;
       const candidates: Array<BoardMatrixSnapshot> = [];
@@ -164,7 +185,7 @@ export class BoardMatrixService {
 
       let value = Number.POSITIVE_INFINITY;
       for (const child of candidates) {
-        value = Math.min(value, this.minimax(child, depth - 1, this.otherPlayer(playerToMove), alpha, beta));
+        value = Math.min(value, this.minimax(child, depth - 1, this.otherPlayer(playerToMove), alpha, beta, chickenHistory));
         beta = Math.min(beta, value);
         if (beta <= alpha) break;
       }
@@ -172,20 +193,24 @@ export class BoardMatrixService {
     }
 
     // Chicken maximizes chicken score.
-    const chickenMoves = this.allChickenMoves(snap);
+    const forbidden = chickenHistory.length > 0 ? new Set(chickenHistory) : undefined;
+    let chickenMoves = this.allChickenMoves(snap, forbidden);
+    // If we filtered everything out, allow repeats rather than "no moves".
+    if (chickenMoves.length === 0) chickenMoves = this.allChickenMoves(snap);
     if (chickenMoves.length === 0) return this.scoreForChickens(snap);
 
     let value = Number.NEGATIVE_INFINITY;
     for (const m of chickenMoves) {
       const child = this.applyStepMove(snap, m.from, m.to);
-      value = Math.max(value, this.minimax(child, depth - 1, this.otherPlayer(playerToMove), alpha, beta));
+      const nextHistory = [this.fingerprint(child), ...chickenHistory].slice(0, 2);
+      value = Math.max(value, this.minimax(child, depth - 1, this.otherPlayer(playerToMove), alpha, beta, nextHistory));
       alpha = Math.max(alpha, value);
       if (beta <= alpha) break;
     }
     return value;
   }
 
-  calculateNextMove(board: Board, depth: number, player: Player): Move {
+  calculateNextMove(board: Board, depth: number, player: Player, chickenHistory: readonly string[] = []): Move {
     const snap = this.createSnapshot(board);
 
     // Generate root candidates and pick the best for the current player.
@@ -199,7 +224,7 @@ export class BoardMatrixService {
       if (hasForcedJumps) {
         for (const j of foxMoves.jumps) {
           const child = this.applyFoxJump(snap, j);
-          const value = this.minimax(child, Math.max(0, depth - 1), Player.CHICKEN, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY);
+          const value = this.minimax(child, Math.max(0, depth - 1), Player.CHICKEN, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, chickenHistory);
           if (value < bestValue || !best) {
             bestValue = value;
             best = { from: j.from, to: j.end };
@@ -208,7 +233,7 @@ export class BoardMatrixService {
       } else {
         for (const m of foxMoves.stepMoves) {
           const child = this.applyStepMove(snap, m.from, m.to);
-          const value = this.minimax(child, Math.max(0, depth - 1), Player.CHICKEN, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY);
+          const value = this.minimax(child, Math.max(0, depth - 1), Player.CHICKEN, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, chickenHistory);
           if (value < bestValue || !best) {
             bestValue = value;
             best = { from: m.from, to: m.to };
@@ -226,13 +251,17 @@ export class BoardMatrixService {
     }
 
     // Chicken turn
-    const chickenMoves = this.allChickenMoves(snap);
+    const forbidden = chickenHistory.length > 0 ? new Set(chickenHistory) : undefined;
+    let chickenMoves = this.allChickenMoves(snap, forbidden);
+    if (chickenMoves.length === 0) chickenMoves = this.allChickenMoves(snap);
+
     let bestValue = Number.NEGATIVE_INFINITY;
     let best: { from: MatrixPoint; to: MatrixPoint } | undefined;
 
     for (const m of chickenMoves) {
       const child = this.applyStepMove(snap, m.from, m.to);
-      const value = this.minimax(child, Math.max(0, depth - 1), Player.FOX, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY);
+      const nextHistory = [this.fingerprint(child), ...chickenHistory].slice(0, 2);
+      const value = this.minimax(child, Math.max(0, depth - 1), Player.FOX, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY, nextHistory);
       if (value > bestValue || !best) {
         bestValue = value;
         best = m;

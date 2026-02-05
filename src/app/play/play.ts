@@ -32,6 +32,18 @@ export class Play {
 
   private aiInProgress = false;
 
+  /**
+   * Keep the last couple chicken-result board fingerprints to avoid chicken oscillations
+   * (e.g. left then immediately right). Only used when the AI plays chickens.
+   */
+  private chickenHistory: string[] = [];
+
+  private fingerprintBoardForHistory(): string {
+    // Use the same fingerprinting logic as BoardMatrixService (states only).
+    const snap = this.boardMatrix.createSnapshot(this.boardService);
+    return Array.from(snap.states).join(',');
+  }
+
   constructor() {
     // Always start a fresh game when entering /play/game.
     // This ensures stale board/signals/selection can't leak across navigations.
@@ -59,7 +71,12 @@ export class Play {
       this.aiInProgress = true;
       queueMicrotask(() => {
         try {
-          const move = this.boardMatrix.calculateNextMove(this.boardService, this.settings.settings()!.numberOfDepth ?? 3, aiPlayer);
+          const move = this.boardMatrix.calculateNextMove(
+            this.boardService,
+            this.settings.settings()!.numberOfDepth ?? 3,
+            aiPlayer,
+            aiPlayer === Player.CHICKEN ? this.chickenHistory : [],
+          );
           const result = this.boardService.attemptMove(
             move.from,
             move.to,
@@ -70,6 +87,11 @@ export class Play {
 
           if (result.message) {
             this.toast.show(result.message, { variant: 'warning' });
+          }
+
+          // After a successful AI chicken move, record the resulting board state.
+          if (aiPlayer === Player.CHICKEN && result.outcome !== 'ignored') {
+            this.chickenHistory = [this.fingerprintBoardForHistory(), ...this.chickenHistory].slice(0, 2);
           }
 
           // Clear any selection after AI move.
@@ -138,6 +160,8 @@ export class Play {
 
   onReset() {
     this.boardService.reset();
+    this.chickenHistory = [];
+
     this.selectedPiece.set(undefined)
     this.moves.set([]);
     this.jumps.set([]);
