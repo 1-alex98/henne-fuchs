@@ -27,3 +27,7 @@
 .play-again-btn:active {
   transform: scale(0.95);
 }
+
+.piece-sprite {
+  transition: transform 220ms ease;
+}

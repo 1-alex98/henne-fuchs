@@ -8,25 +8,30 @@ import {Player, Point, State} from '../board';
   styleUrl: './cell.css',
 })
 export class Cell {
-  x = input.required<number>()
+  cellX = input.required<number>()
+  cellY = input.required<number>()
   playersTurn = input.required<Player>()
   selectedPiece = input.required<Point|undefined>()
+
   selectable = computed(() =>
     (this.playersTurn() == Player.FOX && this.state() == State.FOX) || (this.playersTurn() == Player.CHICKEN && this.state() == State.CHICKEN)
   );
-  selected = computed(() => this.selectedPiece()?.x == this.x() && this.selectedPiece()?.y == this.y())
-  y = input.required<number>()
+  selected = computed(() => this.selectedPiece()?.x == this.cellX() && this.selectedPiece()?.y == this.cellY())
+
   state = input.required<State>()
-  id = computed(() => `${this.x().toString()} ${this.y().toString()}`)
-  xCoordinate = computed(() => this.x() * 50  + 100 - 15)
-  yCoordinate = computed(() => this.y() * 50  + 100 - 15)
+  id = computed(() => `${this.cellX().toString()} ${this.cellY().toString()}`)
+
+  // Render relative to the parent <g> transform (piece-sprite). The parent is responsible for positioning.
+  xCoordinate = computed(() => 0)
+  yCoordinate = computed(() => 0)
+
   @Output() imageClicked = new EventEmitter<Point>();
 
-  emitClick(event: MouseEvent) {
+  emitClick() {
     if(!this.selectable()) {
       return;
     }
-    this.imageClicked.emit(new Point(this.x(), this.y()));
+    this.imageClicked.emit(new Point(this.cellX(), this.cellY()));
   }
 
   protected readonly State = State;

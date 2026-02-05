@@ -1,17 +1,17 @@
-import {Component, effect, inject, signal, Signal} from '@angular/core';
+import {Component, effect, inject, signal} from '@angular/core';
 import { Router } from '@angular/router';
-import {Cell} from './cell/cell';
 import {Board, JumpOption, Player, Point, State} from './board';
 import {Overlay} from './overlay/overlay';
 import { ToastService } from '../shared/toast/toast.service';
 import { GameSettingsService } from './game-settings.service';
 import { BoardMatrixService } from './ai/board-matrix.service';
+import { Cell } from './cell/cell';
 
 @Component({
   selector: 'app-play',
   imports: [
+    Overlay,
     Cell,
-    Overlay
   ],
   templateUrl: './play.html',
   styleUrl: './play.css',
@@ -29,6 +29,11 @@ export class Play {
   jumps = signal<JumpOption[]>([])
   allJumps = signal<JumpOption[]>([])
   allMoves = signal<Point[]>([])
+
+  /** Animated UI model: one sprite per piece. */
+  uiPieces = signal<{ key: string; state: State; x: number; y: number }[]>([]);
+  private uiLocked = false;
+  private readonly moveAnimMs = 220;
 
   private aiInProgress = false;
 
@@ -72,6 +77,26 @@ export class Play {
       }
     });
 
+    // Keep UI sprites in sync with board state when not animating.
+    effect(() => {
+      // Depend on these signals so the effect reruns after moves.
+      this.boardService.playersTurn();
+      this.boardService.winingReason();
+      // Also depend on piece states.
+      for (let x = 0; x < 7; x++) {
+        for (let y = 0; y < 7; y++) {
+          try {
+            this.boardService.stateFor(x, y)();
+          } catch {
+            // Some coordinates are not part of the cross-shaped board.
+          }
+        }
+      }
+      if (!this.uiLocked) {
+        this.resyncUiPiecesFromBoard();
+      }
+    });
+
     // One-player mode: auto-play the AI side.
     effect(() => {
       const s = this.settings.settings();
@@ -82,10 +107,10 @@ export class Play {
       const aiPlayer = human === Player.CHICKEN ? Player.FOX : Player.CHICKEN;
       const isAiTurn = this.boardService.playersTurn() === aiPlayer;
 
-      if (!isAiTurn || this.aiInProgress) return;
+      if (!isAiTurn || this.aiInProgress || this.uiLocked) return;
 
       this.aiInProgress = true;
-      queueMicrotask(() => {
+      queueMicrotask(async () => {
         try {
           const move = this.boardMatrix.calculateNextMove(
             this.boardService,
@@ -93,34 +118,66 @@ export class Play {
             aiPlayer,
             aiPlayer === Player.CHICKEN ? this.chickenHistory : [],
           );
-          const result = this.boardService.attemptMove(
-            move.from,
-            move.to,
-            this.boardService.getMoves(move.from),
-            this.boardService.getJumps(move.from),
-            this.boardService.getAllJumps(),
-          );
 
-          if (result.message) {
-            this.toast.show(result.message, { variant: 'warning' });
-          }
+          const result = await this.animateThenAttemptMove(move.from, move.to);
 
           // After a successful AI chicken move, record the resulting board state.
           if (aiPlayer === Player.CHICKEN && result.outcome !== 'ignored') {
             this.chickenHistory = [this.fingerprintBoardForHistory(), ...this.chickenHistory].slice(0, 2);
           }
 
-          // Clear any selection after AI move.
-          this.selectedPiece.set(undefined);
-          this.moves.set([]);
-          this.jumps.set([]);
-          this.allJumps.set([]);
-          this.allMoves.set([]);
+          this.clearSelection();
         } finally {
           this.aiInProgress = false;
         }
       });
     });
+  }
+
+  private clearSelection() {
+    this.selectedPiece.set(undefined);
+    this.moves.set([]);
+    this.jumps.set([]);
+    this.allJumps.set([]);
+    this.allMoves.set([]);
+  }
+
+  private resyncUiPiecesFromBoard() {
+    const pieces = this.boardService.getPieces().map(p => ({
+      key: `${p.state}-${p.point.x}-${p.point.y}`,
+      state: p.state,
+      x: p.point.x,
+      y: p.point.y,
+    }));
+    this.uiPieces.set(pieces);
+  }
+
+  private async animateThenAttemptMove(from: Point, to: Point) {
+    this.uiLocked = true;
+
+    // Optimistically animate the sprite.
+    const updated = this.uiPieces().map(p => (p.x === from.x && p.y === from.y ? { ...p, x: to.x, y: to.y } : p));
+    this.uiPieces.set(updated);
+
+    await new Promise(resolve => setTimeout(resolve, this.moveAnimMs));
+
+    const result = this.boardService.attemptMove(
+      from,
+      to,
+      this.boardService.getMoves(from),
+      this.boardService.getJumps(from),
+      this.boardService.getAllJumps(),
+    );
+
+    if (result.message) {
+      this.toast.show(result.message, { variant: 'warning' });
+    }
+
+    this.uiLocked = false;
+    // Final sync (handles captures/punishments etc.).
+    this.resyncUiPiecesFromBoard();
+
+    return result;
   }
 
   private isHumanTurn(): boolean {
@@ -130,12 +187,13 @@ export class Play {
     return this.boardService.playersTurn() === human;
   }
 
-  public stateFor(x:number, y:number):Signal<State> {
-    return this.boardService.stateFor(x, y);
+  /** Template helper: build a proper Point instance for click handlers. */
+  protected point(x: number, y: number): Point {
+    return new Point(x, y);
   }
 
   protected clickedPiece(p: Point) {
-    if (!this.isHumanTurn() || this.boardService.winingReason()) return;
+    if (!this.isHumanTurn() || this.boardService.winingReason() || this.uiLocked) return;
 
     this.selectedPiece.set(p)
     this.moves.set(this.boardService.getMoves(p))
@@ -148,41 +206,27 @@ export class Play {
     }
   }
 
-  protected styleClassFor(x: number, y: number) {
-    if(this.jumps().find(option => option.end.x == x && option.end.y == y) != undefined) {
-      return "jumpable";
-    }
-    return this.moves().find(p => p.x == x && p.y == y) != undefined? "clickable" : "" ;
-  }
-
   protected clickedMove(x: number, y: number) {
-    if (!this.isHumanTurn() || this.boardService.winingReason()) return;
+    if (!this.isHumanTurn() || this.boardService.winingReason() || this.uiLocked) return;
 
-    const result = this.boardService.attemptMove(this.selectedPiece(), new Point(x, y), this.moves(), this.jumps(), this.allJumps());
+    const from = this.selectedPiece();
+    if (!from) return;
 
-    if (result.message) {
-      this.toast.show(result.message, { variant: 'warning' });
-    }
-
-    if (result.outcome === 'ignored') {
-      return;
-    }
-
-    this.selectedPiece.set(undefined)
-    this.moves.set([])
-    this.jumps.set([])
-    this.allJumps.set([])
+    void this.animateThenAttemptMove(from, new Point(x, y)).then(result => {
+      if (result.outcome === 'ignored') return;
+      this.selectedPiece.set(undefined)
+      this.moves.set([])
+      this.jumps.set([])
+      this.allJumps.set([])
+    });
   }
 
   onReset() {
     this.boardService.reset();
     this.chickenHistory = [];
 
-    this.selectedPiece.set(undefined)
-    this.moves.set([]);
-    this.jumps.set([]);
-    this.allJumps.set([]);
-    this.allMoves.set([]);
+    this.clearSelection();
+    this.resyncUiPiecesFromBoard();
   }
 
   onPlayAgain() {
@@ -192,4 +236,12 @@ export class Play {
   }
 
   protected readonly Player = Player;
+  protected readonly State = State;
+
+  protected styleClassFor(x: number, y: number) {
+    if (this.jumps().find(option => option.end.x == x && option.end.y == y) != undefined) {
+      return 'jumpable';
+    }
+    return this.moves().find(p => p.x == x && p.y == y) != undefined ? 'clickable' : '';
+  }
 }

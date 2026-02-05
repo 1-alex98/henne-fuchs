@@ -126,50 +126,24 @@
     <circle id="p24" cx="250" cy="300" r="8" (click)="clickedMove(3, 4)" [class]="styleClassFor(3, 4)"/>
     <circle id="p25" cx="300" cy="300" r="8" (click)="clickedMove(4, 4)" [class]="styleClassFor(4, 4)"/>
 
-    <!-- Chickens/Foxes -->
+    <!-- Chickens/Foxes (animated sprites) -->
+    @for (p of uiPieces(); track p.key) {
+      <g
+        class="piece-sprite"
+        [attr.transform]="'translate(' + ((p.x * 50 + 100) - 15) + ',' + ((p.y * 50 + 100) - 15) + ')'"
+      >
+        <g
+          app-cell
+          [cellX]="p.x"
+          [cellY]="p.y"
+          [state]="p.state"
+          [playersTurn]="boardService.playersTurn()"
+          [selectedPiece]="selectedPiece()"
+          (imageClicked)="clickedPiece($event)"
+        ></g>
+      </g>
+    }
 
-    <!-- left -->
-    <g app-cell [state]="stateFor(0,2)()" [x]="0" [y]="2" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="selectedPiece()"></g>
-    <g app-cell [state]="stateFor(1,2)()" [x]="1" [y]="2" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="selectedPiece()"></g>
-    <g app-cell [state]="stateFor(0,3)()" [x]="0" [y]="3" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="selectedPiece()"></g>
-    <g app-cell [state]="stateFor(1,3)()" [x]="1" [y]="3" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="selectedPiece()"></g>
-    <g app-cell [state]="stateFor(0,4)()" [x]="0" [y]="4" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="selectedPiece()"></g>
-    <g app-cell [state]="stateFor(1,4)()" [x]="1" [y]="4" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="selectedPiece()"></g>
-
-    <!-- right -->
-    <g app-cell [state]="stateFor(5,2)()" [x]="5" [y]="2" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="selectedPiece()"></g>
-    <g app-cell [state]="stateFor(6,2)()" [x]="6" [y]="2" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="selectedPiece()"></g>
-    <g app-cell [state]="stateFor(5,3)()" [x]="5" [y]="3" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="selectedPiece()"></g>
-    <g app-cell [state]="stateFor(6,3)()" [x]="6" [y]="3" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="selectedPiece()"></g>
-    <g app-cell [state]="stateFor(5,4)()" [x]="5" [y]="4" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="selectedPiece()"></g>
-    <g app-cell [state]="stateFor(6,4)()" [x]="6" [y]="4" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="selectedPiece()"></g>
-
-    <!-- top -->
-    <g app-cell [state]="stateFor(2,0)()" [x]="2" [y]="0" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="selectedPiece()"></g>
-    <g app-cell [state]="stateFor(3,0)()" [x]="3" [y]="0" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="selectedPiece()"></g>
-    <g app-cell [state]="stateFor(4,0)()" [x]="4" [y]="0" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="selectedPiece()"></g>
-    <g app-cell [state]="stateFor(2,1)()" [x]="2" [y]="1" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="selectedPiece()"></g>
-    <g app-cell [state]="stateFor(3,1)()" [x]="3" [y]="1" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="selectedPiece()"></g>
-    <g app-cell [state]="stateFor(4,1)()" [x]="4" [y]="1" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="selectedPiece()"></g>
-
-    <!-- bottom -->
-    <g app-cell [state]="stateFor(2,5)()" [x]="2" [y]="5" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="selectedPiece()"></g>
-    <g app-cell [state]="stateFor(3,6)()" [x]="3" [y]="6" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="selectedPiece()"></g>
-    <g app-cell [state]="stateFor(4,5)()" [x]="4" [y]="5" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="selectedPiece()"></g>
-    <g app-cell [state]="stateFor(2,6)()" [x]="2" [y]="6" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="selectedPiece()"></g>
-    <g app-cell [state]="stateFor(3,5)()" [x]="3" [y]="5" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="selectedPiece()"></g>
-    <g app-cell [state]="stateFor(4,6)()" [x]="4" [y]="6" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="selectedPiece()"></g>
-
-    <!-- center block -->
-    <g app-cell [state]="stateFor(2,2)()" [x]="2" [y]="2" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="selectedPiece()"></g>
-    <g app-cell [state]="stateFor(3,2)()" [x]="3" [y]="2" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="selectedPiece()"></g>
-    <g app-cell [state]="stateFor(4,2)()" [x]="4" [y]="2" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="selectedPiece()"></g>
-    <g app-cell [state]="stateFor(2,3)()" [x]="2" [y]="3" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="selectedPiece()"></g>
-    <g app-cell [state]="stateFor(3,3)()" [x]="3" [y]="3" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="selectedPiece()"></g>
-    <g app-cell [state]="stateFor(4,3)()" [x]="4" [y]="3" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="selectedPiece()"></g>
-    <g app-cell [state]="stateFor(2,4)()" [x]="2" [y]="4" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="selectedPiece()"></g>
-    <g app-cell [state]="stateFor(3,4)()" [x]="3" [y]="4" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="selectedPiece()"></g>
-    <g app-cell [state]="stateFor(4,4)()" [x]="4" [y]="4" [playersTurn]="boardService.playersTurn()" (imageClicked)="clickedPiece($event)" [selectedPiece]="selectedPiece()"></g>
   </svg>
 
 </div>

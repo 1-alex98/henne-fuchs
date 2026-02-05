@@ -339,4 +339,18 @@ export class Board {
     if (!cell) return;
     cell.getWritableState().set(state);
   }
+
+  /**
+   * Returns all pieces currently on the board (non-empty cells).
+   * Intended for UI rendering.
+   */
+  getPieces(): { point: Point; state: State }[] {
+    const pieces: { point: Point; state: State }[] = [];
+    for (const cell of this.board.values()) {
+      const state = cell.getState()();
+      if (state === State.EMPTY) continue;
+      pieces.push({ point: new Point(cell.point.x, cell.point.y), state });
+    }
+    return pieces;
+  }
 }
