@@ -7,6 +7,7 @@ export interface GameSettings {
   mode: GameMode;
   /** Only relevant for one-player mode. */
   humanPlaysAs?: Player;
+  numberOfDepth?: number;
 }
 
 @Injectable({
@@ -20,8 +21,8 @@ export class GameSettingsService {
     this.settings.set({ mode: 'two-players' });
   }
 
-  setOnePlayer(humanPlaysAs: Player) {
-    this.settings.set({ mode: 'one-player', humanPlaysAs });
+  setOnePlayer(humanPlaysAs: Player, difficulty: number) {
+    this.settings.set({ mode: 'one-player', humanPlaysAs , numberOfDepth: difficulty});
   }
 
   clear() {

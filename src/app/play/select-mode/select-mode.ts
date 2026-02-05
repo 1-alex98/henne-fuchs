@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { Player } from '../board';
 import { GameSettingsService } from '../game-settings.service';
 
-type SelectStep = 'mode' | 'side';
+type SelectStep = 'mode' | 'side' | 'difficulty';
 
 @Component({
   selector: 'app-select-mode',
@@ -20,6 +20,7 @@ export class SelectMode {
   step = signal<SelectStep>('mode');
   /** Default the side selection to chickens (more common). */
   selectedSide = signal<Player>(Player.CHICKEN);
+  difficulty = signal<number>(1);
 
   chooseTwoPlayers() {
     this.settings.setTwoPlayers();
@@ -35,11 +36,15 @@ export class SelectMode {
   }
 
   startOnePlayer() {
-    this.settings.setOnePlayer(this.selectedSide());
+    this.settings.setOnePlayer(this.selectedSide(), this.difficulty());
     void this.router.navigateByUrl('/play/game');
   }
 
   back() {
     this.step.set('mode');
+  }
+
+  protected chooseDifficulty() {
+    this.step.set('difficulty');
   }
 }

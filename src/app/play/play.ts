@@ -55,7 +55,7 @@ export class Play {
       this.aiInProgress = true;
       queueMicrotask(() => {
         try {
-          const move = this.boardMatrix.calculateNextMove(this.boardService, 3, aiPlayer);
+          const move = this.boardMatrix.calculateNextMove(this.boardService, this.settings.settings()!.numberOfDepth ?? 3, aiPlayer);
           const result = this.boardService.attemptMove(
             move.from,
             move.to,

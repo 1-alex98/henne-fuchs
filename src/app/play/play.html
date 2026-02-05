@@ -42,6 +42,8 @@
         stroke-width: 2;
       }
     </style>
+    <!-- Stall -->
+    <rect height="100" width="100" fill="blue" opacity="0.1" x="200" y="100" />
 
     <!-- Connections -->
     <!-- Horizontal lines -->
@@ -97,12 +99,13 @@
     <circle id="p27" cx="350" cy="300" r="8" (click)="clickedMove(5, 4)" [class]="styleClassFor(5, 4)"/>
 
     <!-- top -->
-    <circle id="p1" cx="200" cy="100" r="8" (click)="clickedMove(2, 0)" [class]="styleClassFor(2,0)"/>
-    <circle id="p2" cx="250" cy="100" r="8" (click)="clickedMove(3, 0)" [class]="styleClassFor(3,0)"/>
-    <circle id="p3" cx="300" cy="100" r="8" (click)="clickedMove(4, 0)" [class]="styleClassFor(4,0)"/>
-    <circle id="p4" cx="200" cy="150" r="8" (click)="clickedMove(2, 1)" [class]="styleClassFor(2,1)"/>
-    <circle id="p5" cx="250" cy="150" r="8" (click)="clickedMove(3, 1)" [class]="styleClassFor(3,1)"/>
-    <circle id="p6" cx="300" cy="150" r="8" (click)="clickedMove(4, 1)" [class]="styleClassFor(4,1)"/>
+    <circle fill="white" id="p1" cx="200" cy="100" r="8" (click)="clickedMove(2, 0)" [class]="styleClassFor(2,0)"/>
+    <circle fill="white" id="p2" cx="250" cy="100" r="8" (click)="clickedMove(3, 0)" [class]="styleClassFor(3,0)"/>
+    <circle fill="white" id="p3" cx="300" cy="100" r="8" (click)="clickedMove(4, 0)" [class]="styleClassFor(4,0)"/>
+    <circle fill="white" id="p4" cx="200" cy="150" r="8" (click)="clickedMove(2, 1)" [class]="styleClassFor(2,1)"/>
+    <circle fill="white" id="p5" cx="250" cy="150" r="8" (click)="clickedMove(3, 1)" [class]="styleClassFor(3,1)"/>
+    <circle fill="white" id="p6" cx="300" cy="150" r="8" (click)="clickedMove(4, 1)" [class]="styleClassFor(4,1)"/>
+
 
     <!-- bottom -->
     <circle id="p28" cx="200" cy="350" r="8" (click)="clickedMove(2, 5)" [class]="styleClassFor(2, 5)"/>

@@ -26,7 +26,7 @@
           class="option side"
           type="button"
           [class.selected]="selectedSide() === Player.CHICKEN"
-          (click)="setSide(Player.CHICKEN)"
+          (click)="chooseDifficulty()"
         >
           <img src="chicken.svg" alt="Play as chickens" />
           <span>Chickens (You)</span>
@@ -36,10 +36,36 @@
           class="option side"
           type="button"
           [class.selected]="selectedSide() === Player.FOX"
-          (click)="setSide(Player.FOX)"
+          (click)="chooseDifficulty()"
         >
           <img src="fox.svg" alt="Play as foxes" />
           <span>Foxes (You)</span>
+        </button>
+      </div>
+    }
+    @if (step() === 'difficulty') {
+      <h1>Play against AI</h1>
+      <p>How hard should it be?</p>
+
+      <div class="options">
+        <button
+          class="option difficulty"
+          type="button"
+          [class.selected]="difficulty() === 2"
+          (click)="difficulty.set(2)"
+        >
+          <img src="easy.svg" alt="Easy" />
+          <span>Easy</span>
+        </button>
+
+        <button
+          class="option side"
+          type="button"
+          [class.selected]="difficulty() === 3"
+          (click)="difficulty.set(3)"
+        >
+          <img src="hard.svg" alt="Hard" />
+          <span>Hard</span>
         </button>
       </div>
 
