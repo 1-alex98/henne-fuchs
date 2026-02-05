@@ -41,3 +41,7 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+/node_modules.bak/@esbuild/win32-x64/esbuild.exe
+/node_modules.bak/@lmdb/lmdb-win32-x64/node.napi.node
+/node_modules.bak/@msgpackr-extract/msgpackr-extract-win32-x64/node.napi.node
+/node_modules.bak/@rollup/rollup-win32-x64-msvc/rollup.win32-x64-msvc.node
