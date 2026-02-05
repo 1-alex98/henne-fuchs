@@ -1,4 +1,20 @@
-<ul>
-  <li><a routerLink="/">Explain</a></li>
-  <li><a routerLink="/play">Play</a></li>
-</ul>
+<nav class="nav">
+  <button
+    type="button"
+    class="nav__toggle"
+    aria-label="Toggle navigation"
+    [attr.aria-expanded]="isMenuOpen()"
+    (click)="toggleMenu()"
+  >
+    <span class="nav__bar"></span>
+    <span class="nav__bar"></span>
+    <span class="nav__bar"></span>
+  </button>
+
+  <div class="nav__brand"></div>
+
+  <ul class="nav__menu" [class.nav__menu--open]="isMenuOpen()" (click)="closeMenu()">
+    <li><a routerLink="/">Explain</a></li>
+    <li><a routerLink="/play">Play</a></li>
+  </ul>
+</nav>
