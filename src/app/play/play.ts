@@ -33,6 +33,10 @@ export class Play {
   private aiInProgress = false;
 
   constructor() {
+    // Always start a fresh game when entering /play/game.
+    // This ensures stale board/signals/selection can't leak across navigations.
+    this.onReset();
+
     // If the user hits /play/game directly, send them to the selection dialog.
     effect(() => {
       if (!this.settings.settings()) {
@@ -138,6 +142,7 @@ export class Play {
     this.moves.set([]);
     this.jumps.set([]);
     this.allJumps.set([]);
+    this.allMoves.set([]);
   }
 
   onPlayAgain() {

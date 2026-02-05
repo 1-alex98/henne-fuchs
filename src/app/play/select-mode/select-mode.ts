@@ -44,7 +44,8 @@ export class SelectMode {
     this.step.set('mode');
   }
 
-  protected chooseDifficulty() {
+  protected chooseDifficulty(player:Player) {
+    this.selectedSide.set(player)
     this.step.set('difficulty');
   }
 }
