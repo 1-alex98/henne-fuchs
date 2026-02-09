@@ -35,7 +35,7 @@ jobs:
         # For GitHub Pages project sites, apps must be built with base-href '/<repo>/'
         run: |
           REPO_NAME="${GITHUB_REPOSITORY#*/}"
-          npx ng build --configuration production --base-href "/${REPO_NAME}/"
+          npx ng build --configuration production
 
       - name: SPA fallback (optional)
         # Helps client-side routes work on refresh (GitHub Pages serves 404.html)
