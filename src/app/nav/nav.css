@@ -12,6 +12,7 @@ h2, p {
   padding: 8px 12px;
   background: #333333;
   color: white;
+  z-index: 1;
 }
 
 .nav__brand {

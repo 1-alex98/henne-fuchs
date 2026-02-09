@@ -12,8 +12,137 @@
 
         <button class="option" type="button" (click)="chooseTwoPlayers()">
           <img src="2players.svg" alt="Two players" />
-          <span>2 Players</span>
+          <span>2 Players (local)</span>
         </button>
+
+        <button class="option" type="button" (click)="chooseTwoPlayersOnline()">
+          <img src="2players.svg" alt="Two players online" />
+          <span>2 Players (online)</span>
+        </button>
+      </div>
+    }
+
+    @if (step() === 'online') {
+      <h1>2 Players (online)</h1>
+      <p>Host a match to get a code, or join using a host code.</p>
+
+      <div class="options">
+        <button class="option" type="button" (click)="chooseOnlineHost()">
+          <span>Host</span>
+        </button>
+
+        <button class="option" type="button" (click)="chooseOnlineJoin()">
+          <span>Join</span>
+        </button>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="secondary" (click)="back()">Back</button>
+      </div>
+    }
+
+    @if (step() === 'online-host-side') {
+      <h1>Host match</h1>
+      <p>First choose which side you want to play. Then we’ll generate a code to share.</p>
+
+      <div class="options">
+        <button
+          class="option side"
+          type="button"
+          [class.selected]="onlineHostSide() === Player.CHICKEN"
+          (click)="chooseOnlineHostSide(Player.CHICKEN)"
+        >
+          <img src="chicken.svg" alt="Play as chickens" />
+          <span>Chickens (You)</span>
+        </button>
+
+        <button
+          class="option side"
+          type="button"
+          [class.selected]="onlineHostSide() === Player.FOX"
+          (click)="chooseOnlineHostSide(Player.FOX)"
+        >
+          <img src="fox.svg" alt="Play as foxes" />
+          <span>Foxes (You)</span>
+        </button>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="secondary" (click)="back()">Back</button>
+      </div>
+    }
+
+    @if (step() === 'online-host') {
+      <h1>Host match</h1>
+      <p>Share this code with your friend. Keep this tab open.</p>
+
+      @if (peerConnection.state().error) {
+        <p class="error">{{ peerConnection.state().error }}</p>
+      }
+
+      <div class="host-row">
+        <div class="code">
+          {{ peerConnection.state().myPeerId || '…' }}
+        </div>
+        <button class="icon" type="button" (click)="copyHostCode()" [disabled]="!peerConnection.state().myPeerId">
+          <img src="copy.svg" alt="Copy code" />
+        </button>
+        <button class="icon" type="button" (click)="shareLink()" [disabled]="!peerConnection.state().myPeerId">
+          <img src="share.svg" alt="Share Link" />
+        </button>
+      </div>
+
+      <div class="waiting" [class.visible]="peerConnection.state().status !== 'connected'">
+        <div class="spinner" aria-hidden="true"></div>
+        <div class="waiting-text">
+          @if (peerConnection.state().status === 'creating-peer') { Creating… }
+          @if (peerConnection.state().status === 'waiting-for-peer') { Waiting for your friend to join… }
+          @if (peerConnection.state().status === 'connecting') { Connecting… }
+          @if (peerConnection.state().status === 'error') { Connection failed. }
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="secondary" (click)="back()">Cancel</button>
+      </div>
+    }
+
+    @if (step() === 'online-join') {
+      <h1>Join match</h1>
+      <p>Enter the host code you received.</p>
+
+      @if (peerConnection.state().error) {
+        <p class="error">{{ peerConnection.state().error }}</p>
+      }
+
+      <div class="join-row">
+        <input
+          class="join-input"
+          type="text"
+          placeholder="Host id"
+          [ngModel]="joinCode()"
+          (ngModelChange)="joinCode.set($event)"
+          [disabled]="peerConnection.state().status === 'creating-peer' || peerConnection.state().status === 'connecting'"
+        />
+        <button
+          class="primary"
+          type="button"
+          (click)="connectOnlineJoin()"
+          [disabled]="peerConnection.state().status === 'creating-peer' || peerConnection.state().status === 'connecting'"
+        >
+          Connect
+        </button>
+      </div>
+
+      @if (peerConnection.state().status === 'creating-peer' || peerConnection.state().status === 'connecting') {
+        <div class="waiting visible">
+          <div class="spinner" aria-hidden="true"></div>
+          <div class="waiting-text">Connecting…</div>
+        </div>
+      }
+
+      <div class="actions">
+        <button type="button" class="secondary" (click)="back()">Back</button>
       </div>
     }
 

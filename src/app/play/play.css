@@ -31,3 +31,25 @@
 .piece-sprite {
   transition: transform 220ms ease;
 }
+
+/* Inline online waiting status next to "Playing" */
+.online-inline-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  margin-left: 0.5em;
+  color: #444;
+  font-size: 0.95rem;
+}
+
+.spinner.spinner--mini {
+  margin: 0;
+  width: 0.9em;
+  height: 0.9em;
+  border-width: 2px;
+  flex: 0 0 auto;
+}
+
+.online-inline-text {
+  white-space: nowrap;
+}

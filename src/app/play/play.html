@@ -10,10 +10,35 @@
     width: 100vw;
     height: 80vh;
   }
+
+  .spinner {
+    margin: 0 auto 1em;
+    width: 2em;
+    height: 2em;
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-top: 4px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
 </style>
 <div style="margin: 1em;">
   <p style="display: flex; flex-wrap: wrap; justify-content: center; gap: 1.5em; width: 100%">
 <span style="padding: 0.3em; display: inline-flex; align-items: center; gap: 0.5em;">
+      @if (isOnlineGame()) {
+        You:
+        <img
+          [src]="myRoleInOnlineGame() == Player.CHICKEN ? 'chicken.svg' : 'fox.svg'"
+          [alt]="myRoleInOnlineGame() == Player.CHICKEN ? 'Chicken' : 'Fox'"
+          width="24"
+          height="24"
+          style="display: inline-block;"
+        />
+      }
       Playing:
       <img
         [src]="boardService.playersTurn() == Player.CHICKEN ? 'chicken.svg' : 'fox.svg'"
@@ -22,12 +47,25 @@
         height="24"
         style="display: inline-block;"
       />
-    </span><!--    <span style="padding: 0.3em">Chickens:{{boardService.chickens()}}</span>-->
-<!--    <span style="padding: 0.3em">Chickens in stall:{{boardService.chickensInStall()}}</span>-->
+
+    </span>
     <button class="play-again-btn" style="padding: 0.3em 0.8em" (click)="onPlayAgain()">Reset</button>
+    <span style="padding: 0.3em; display: inline-flex; align-items: center; gap: 0.5em;">
+      @if (isOnlineGame() && (onlineWaiting() || opponentWaiting()) && !boardService.winingReason()) {
+        <span class="online-inline-status" aria-live="polite">
+          <span class="spinner spinner--mini" aria-hidden="true"></span>
+          <span class="online-inline-text">
+            @if (onlineWaiting()) { {{ onlineWaitingText() }} }
+            @if (!onlineWaiting() && opponentWaiting()) { Waiting for the other player's move… }
+          </span>
+        </span>
+      }
+    </span>
   </p>
 </div>
 <app-overlay [text]="boardService.winingReason()" (playAgain)="onPlayAgain()"></app-overlay>
+
+
 <div class="svg-bottom">
   <svg viewBox="75 75 350 350" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
 
